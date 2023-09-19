@@ -8,7 +8,8 @@ export const theme: DefaultTheme = {
     blue01: "#172B4D",
     blue02: "#0085FF",
     blue03: "#EDF3FF",
-    beige: "#FFF5E0",
+    beige01: "#FFF5E0",
+    beige02: "#ffedc7",
     black01: "#000000",
     black02: "#0F0F0F",
     white: "#FFFFFF",
@@ -18,3 +19,7 @@ export const theme: DefaultTheme = {
     gray04: "#E9E9E9",
   },
 };
+
+export const DESKTOP_W = 1200;
+export const WINDOW_W = window.innerWidth;
+export const WINDOW_H = window.innerHeight;
