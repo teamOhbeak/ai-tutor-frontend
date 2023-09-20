@@ -106,6 +106,7 @@ const StBtnList = styled.ul`
     padding: 60px 48px;
     background-color: ${({ theme }) => theme.colors.beige01};
     border-radius: 16px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
 
     h3 {
       color: ${({ theme }) => theme.colors.black01};

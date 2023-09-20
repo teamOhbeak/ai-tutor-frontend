@@ -44,8 +44,10 @@ const StButton = styled.button<{ btnStatus: BtnStatusType }>`
         return theme.colors.red03;
       case "beige":
         return theme.colors.beige01;
+      case "cancel":
+        return theme.colors.gray02;
       case "disabled":
-        return theme.colors.gray03;
+        return theme.colors.gray04;
       case "transparent":
         return "transparent";
     }
@@ -65,8 +67,10 @@ const StButton = styled.button<{ btnStatus: BtnStatusType }>`
           return theme.colors.red02;
         case "beige":
           return theme.colors.beige02;
+        case "cancel":
+          return theme.colors.gray01;
         case "disabled":
-          return theme.colors.gray02;
+          return theme.colors.gray04;
         case "transparent":
           return "transparent";
       }
@@ -91,8 +95,10 @@ const StContent = styled.div<{
           return theme.colors.white;
         case "beige":
           return theme.colors.black02;
+        case "cancel":
+          return theme.colors.white;
         case "disabled":
-          return theme.colors.gray01;
+          return theme.colors.gray02;
         case "transparent":
           return theme.colors.black01;
       }

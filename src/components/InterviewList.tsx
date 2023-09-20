@@ -1,71 +1,70 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import Button from "./elements/Button";
-import { useNavigate } from "react-router-dom";
 import { WINDOW_H } from "../styles/theme";
 import ListHeader from "./ListComponents/ListHeader";
-import ModalLayout from "./layout/ModalLayout";
-import QnASettingModal from "./ListComponents/QnASettingModal";
+import Button from "./elements/Button";
+import { useNavigate } from "react-router-dom";
 
 const TEST_QNA = [
   {
     title:
       "title title title title title title title title title titletitle title title title title title title title title titletitle title title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title ",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title ",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
   {
     title: "title title title title title title title title title title",
     username: "user12345",
-    createdAt: "2023-09-19",
+    createdAt: "2023-09-19 00:00",
   },
 ];
-const QnAList = () => {
+
+const InterviewList = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -74,8 +73,8 @@ const QnAList = () => {
   return (
     <StContainer>
       <ListHeader
-        title="QnA List"
-        btnText="질문하기"
+        title="Interview List"
+        btnText="면접하기"
         clickHandler={() => setOpenModal(true)}
       />
       <StBody>
@@ -83,18 +82,18 @@ const QnAList = () => {
           {TEST_QNA.map((val, i, arr) => {
             const { title, username, createdAt } = val;
             return (
-              <StItem isLast={i === arr.length - 1}>
+              <StItem key={i} isLast={i === arr.length - 1}>
                 <StInfo>
-                  <StQnATitle>{title}</StQnATitle>
+                  <StQnATitle>{createdAt}</StQnATitle>
                   <StSubInfo>
                     <StQnAUsername>{username}</StQnAUsername>
-                    <StQnADate>{createdAt}</StQnADate>
                   </StSubInfo>
                 </StInfo>
                 <StBtnWrapper>
                   <Button
                     btnStatus="beige"
-                    clickHandler={() => handleNavigate("/qna-detail/new")}
+                    clickHandler={() => handleNavigate("/interview-detail/id")}
+                    // clickHandler={() => handleNavigate(`/interview-detail/${id}`)}
                     disabled={false}
                   >
                     <span>상세보기</span>
@@ -105,18 +104,11 @@ const QnAList = () => {
           })}
         </StList>
       </StBody>
-      {openModal ? (
-        <ModalLayout width="480px" height="auto">
-          <QnASettingModal clickHandler={() => setOpenModal(false)} />
-        </ModalLayout>
-      ) : (
-        <></>
-      )}
     </StContainer>
   );
 };
 
-export default QnAList;
+export default InterviewList;
 
 const StContainer = styled.div`
   display: flex;
@@ -177,12 +169,6 @@ const StSubInfo = styled.div`
 
 const StQnAUsername = styled.span`
   color: ${({ theme }) => theme.colors.gray01};
-  font-size: 14px;
-  font-weight: 400;
-`;
-
-const StQnADate = styled.span`
-  color: ${({ theme }) => theme.colors.gray02};
   font-size: 14px;
   font-weight: 400;
 `;
