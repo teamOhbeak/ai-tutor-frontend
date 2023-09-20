@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-import Button from "../elements/Button";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+import Button from "../elements/Button";
 
 interface QnADeleteModalProps {
   clickHandler: () => void;
+  target: string;
+  url: string;
 }
 
-const DeleteModal = ({ clickHandler }: QnADeleteModalProps) => {
+const DeleteModal = ({ clickHandler, target, url }: QnADeleteModalProps) => {
   const [confirm, setConfirm] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -16,20 +19,20 @@ const DeleteModal = ({ clickHandler }: QnADeleteModalProps) => {
   return (
     <StContainer>
       <StHeader>
-        <h2>QnA 삭제하기</h2>
+        <h2>{target} 삭제하기</h2>
       </StHeader>
       <StBody>
         {confirm ? (
           <StTitle>삭제되었습니다.</StTitle>
         ) : (
-          <StTitle>질문을 삭제하시겠습니까?</StTitle>
+          <StTitle>삭제하시겠습니까?</StTitle>
         )}
       </StBody>
       <StBtnWrapper>
         {confirm ? (
           <Button
             btnStatus={"primary02"}
-            clickHandler={() => handleNavigate("/qna-list")}
+            clickHandler={() => handleNavigate(url)}
             disabled={false}
           >
             <span>확인</span>

@@ -8,10 +8,11 @@ import {
 } from "react-icons/bs";
 import { FaUserAlt } from "react-icons/fa";
 
-import ModalLayout from "./layout/ModalLayout";
-import DeleteModal from "./QnADetail/DeleteModal";
-import Button from "./elements/Button";
-import { WINDOW_H, theme } from "../styles/theme";
+import ModalLayout from "../layout/ModalLayout";
+import DeleteModal from "./DeleteModal";
+import Button from "../elements/Button";
+import { CommentType } from "../../types/etcTypes";
+import { WINDOW_H, theme } from "../../styles/theme";
 
 const TEST_DATA = {
   title: "React suspense 사용 방법",
@@ -50,13 +51,8 @@ const TEST_DATA = {
   ],
 };
 
-type CommentType = {
-  owner: string;
-  comment: string;
-};
-
 const QnADetail = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [comment, setComment] = useState<CommentType>({
     owner: "user",
     comment: "",
@@ -206,7 +202,11 @@ const QnADetail = () => {
       </StBody>
       {openDeleteModal ? (
         <ModalLayout width="480px" height="auto">
-          <DeleteModal clickHandler={handleDelete} />
+          <DeleteModal
+            clickHandler={handleDelete}
+            target="QnA"
+            url="/qna-list"
+          />
         </ModalLayout>
       ) : (
         <></>
