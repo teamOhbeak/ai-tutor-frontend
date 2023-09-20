@@ -1,12 +1,17 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import { WINDOW_H, theme } from "../styles/theme";
-import Button from "./elements/Button";
-import { BsFillTrashFill, BsChatLeftDotsFill } from "react-icons/bs";
-import { FaUserAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import {
+  BsFillTrashFill,
+  BsChatLeftDotsFill,
+  BsCodeSlash,
+} from "react-icons/bs";
+import { FaUserAlt } from "react-icons/fa";
+
 import ModalLayout from "./layout/ModalLayout";
 import DeleteModal from "./QnADetail/DeleteModal";
+import Button from "./elements/Button";
+import { WINDOW_H, theme } from "../styles/theme";
 
 const TEST_DATA = {
   title: "React suspense 사용 방법",
@@ -94,6 +99,8 @@ const QnADetail = () => {
     setComment({ ...comment, comment: e.target.value });
   };
 
+  const handleCode = () => {};
+
   const handleSubmit = () => {
     console.log("SUBMIT COMMENT");
     setCommentList((prev) => [...prev, comment]);
@@ -172,14 +179,19 @@ const QnADetail = () => {
         <StNewChat>
           <StNewComment>
             <label htmlFor="new-chat">Q.</label>
-            <textarea
-              ref={contentRef}
-              autoComplete="off"
-              value={comment.comment}
-              onChange={(e) => handleComment(e)}
-              rows={1}
-              placeholder="질문을 입력해 주세요."
-            />
+            <StTextContainer>
+              <textarea
+                ref={contentRef}
+                autoComplete="off"
+                value={comment.comment}
+                onChange={(e) => handleComment(e)}
+                rows={1}
+                placeholder="질문을 입력해 주세요."
+              />
+              <StCodeBtn onClick={() => handleCode()}>
+                <BsCodeSlash fill={theme.colors.black02} />
+              </StCodeBtn>
+            </StTextContainer>
           </StNewComment>
           <StCommentBtn>
             <Button
@@ -356,7 +368,7 @@ const StNewChat = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px;
+  padding: 12px;
   background-color: ${({ theme }) => theme.colors.blue03};
   border-radius: 8px;
 `;
@@ -374,13 +386,43 @@ const StNewComment = styled.div`
     font-size: 16px;
     font-weight: 500;
   }
+`;
+
+const StTextContainer = styled.div`
+  flex-grow: 1;
+  background-color: ${({ theme }) => theme.colors.white};
+  border-radius: 8px;
+  padding: 12px;
 
   textarea {
     width: 100%;
-    padding: 12px;
+    padding-bottom: 8px;
+    background-color: ${({ theme }) => theme.colors.white};
     border: none;
     border-radius: 8px;
     height: auto;
+    resize: none;
   }
 `;
+
+const StCodeBtn = styled.div`
+  background-color: ${({ theme }) => theme.colors.gray04};
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.1 ease;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray03};
+  }
+`;
+
 const StCommentBtn = styled.div``;
