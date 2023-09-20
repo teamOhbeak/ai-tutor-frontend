@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-import { WINDOW_H } from "../styles/theme";
-import ListHeader from "./ListComponents/ListHeader";
-import Button from "./elements/Button";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+import ModalLayout from "./layout/ModalLayout";
+import ListHeader from "./ListComponents/ListHeader";
+import InterviewSettingModal from "./ListComponents/InterviewSettingModal";
+import Button from "./elements/Button";
+import { WINDOW_H } from "../styles/theme";
 
 const TEST_QNA = [
   {
@@ -104,6 +107,13 @@ const InterviewList = () => {
           })}
         </StList>
       </StBody>
+      {openModal ? (
+        <ModalLayout width="480px" height="auto">
+          <InterviewSettingModal clickHandler={() => setOpenModal(false)} />
+        </ModalLayout>
+      ) : (
+        <></>
+      )}
     </StContainer>
   );
 };
