@@ -10,7 +10,7 @@ import { FaUserAlt } from "react-icons/fa";
 import ModalLayout from "../layout/ModalLayout";
 import InterviewDoneModal from "./InterviewDoneModal";
 import Button from "../elements/Button";
-import { CommentType } from "../../types/etcTypes";
+import { CommentType } from "../../types/QnATypes";
 import { WINDOW_H, theme } from "../../styles/theme";
 
 const TEST_DATA = {

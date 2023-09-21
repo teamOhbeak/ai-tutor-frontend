@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -6,66 +7,9 @@ import ModalLayout from "./layout/ModalLayout";
 import ListHeader from "./ListComponents/ListHeader";
 import InterviewSettingModal from "./ListComponents/InterviewSettingModal";
 import Button from "./elements/Button";
+import { getInterviews } from "../api/interviewApi";
+import { InterviewListType } from "../types/interviewTypes";
 import { WINDOW_H } from "../styles/theme";
-
-const TEST_QNA = [
-  {
-    title:
-      "title title title title title title title title title titletitle title title title title title title title title titletitle title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title ",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title ",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19 00:00",
-  },
-];
 
 const InterviewList = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -73,48 +17,60 @@ const InterviewList = () => {
   const navigate = useNavigate();
   const handleNavigate = (target: string) => navigate(target);
 
+  const { data, isLoading, isSuccess } = useQuery(["interviews"], () =>
+    getInterviews()
+  );
+
+  console.log(data);
   return (
-    <StContainer>
-      <ListHeader
-        title="Interview List"
-        btnText="면접하기"
-        clickHandler={() => setOpenModal(true)}
-      />
-      <StBody>
-        <StList>
-          {TEST_QNA.map((val, i, arr) => {
-            const { title, username, createdAt } = val;
-            return (
-              <StItem key={i} $isLast={i === arr.length - 1}>
-                <StInfo>
-                  <StQnATitle>{createdAt}</StQnATitle>
-                  <StSubInfo>
-                    <StQnAUsername>{username}</StQnAUsername>
-                  </StSubInfo>
-                </StInfo>
-                <StBtnWrapper>
-                  <Button
-                    btnStatus="beige"
-                    clickHandler={() => handleNavigate("/interview-detail/id")}
-                    // clickHandler={() => handleNavigate(`/interview-detail/${id}`)}
-                    disabled={false}
-                  >
-                    <span>상세보기</span>
-                  </Button>
-                </StBtnWrapper>
-              </StItem>
-            );
-          })}
-        </StList>
-      </StBody>
-      {openModal ? (
-        <ModalLayout width="480px" height="auto">
-          <InterviewSettingModal clickHandler={() => setOpenModal(false)} />
-        </ModalLayout>
+    <>
+      {!isLoading && isSuccess ? (
+        <StContainer>
+          <ListHeader
+            title="Interview List"
+            btnText="면접하기"
+            clickHandler={() => setOpenModal(true)}
+          />
+          <StBody>
+            <StList>
+              {(data as InterviewListType[]).map((val, i, arr) => {
+                const { id, createdAt, username, status } = val;
+                return (
+                  <StItem key={id} $isLast={i === arr.length - 1}>
+                    <StInfo>
+                      <StQnATitle>{createdAt}</StQnATitle>
+                      {/* <StSubInfo>
+                        <StQnAUsername>{username}</StQnAUsername>
+                      </StSubInfo> */}
+                    </StInfo>
+                    <StBtnWrapper>
+                      <Button
+                        btnStatus="beige"
+                        clickHandler={() =>
+                          handleNavigate(`/interview-detail/${id}`)
+                        }
+                        disabled={false}
+                      >
+                        <span>상세보기</span>
+                      </Button>
+                    </StBtnWrapper>
+                  </StItem>
+                );
+              })}
+            </StList>
+          </StBody>
+          {openModal ? (
+            <ModalLayout width="480px" height="auto">
+              <InterviewSettingModal clickHandler={() => setOpenModal(false)} />
+            </ModalLayout>
+          ) : (
+            <></>
+          )}
+        </StContainer>
       ) : (
         <></>
       )}
-    </StContainer>
+    </>
   );
 };
 

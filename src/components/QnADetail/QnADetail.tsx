@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { CodeBlock, dracula } from "react-code-blocks";
 import styled from "styled-components";
 import {
   BsFillTrashFill,
@@ -11,7 +12,7 @@ import { FaUserAlt } from "react-icons/fa";
 import ModalLayout from "../layout/ModalLayout";
 import DeleteModal from "./DeleteModal";
 import Button from "../elements/Button";
-import { CommentType } from "../../types/etcTypes";
+import { CommentType } from "../../types/QnATypes";
 import { WINDOW_H, theme } from "../../styles/theme";
 
 const TEST_DATA = {
@@ -48,7 +49,44 @@ const TEST_DATA = {
       
       한 회계연도를 넘어 계속하여 지출할 필요가 있을 때에는 정부는 연한을 정하여 계속비로서 국회의 의결을 얻어야 한다. 국회는 국무총리 또는 국무위원의 해임을 대통령에게 건의할 수 있다. 선거에 있어서 최고득표자가 2인 이상인 때에는 국회의 재적의원 과반수가 출석한 공개회의에서 다수표를 얻은 자를 당선자로 한다.`,
     },
+    {
+      owner: "user",
+      comment:
+        "코드블럭 테스트 ```html <span>hello</span>```코드테스트 중입니다.",
+    },
   ],
+};
+
+interface CodeTextProps {
+  text: string;
+  lang: string;
+}
+const CodeText = ({ text, lang }: CodeTextProps) => {
+  console.log(text);
+  const str = text;
+  const regex = /```(\w+)\s(.*?)```/s; // 정규식 패턴
+
+  const match = str.match(regex); // 문자열에서 패턴과 일치하는 부분을 찾음
+
+  let language: string = "";
+  let codeBlock: string = "";
+
+  if (match) {
+    language = match[1]; // 언어 부분을 가져옴
+    codeBlock = match[2]; // 코드 블록 부분을 가져옴
+    console.log(`언어: ${language}`);
+    console.log(`코드 블록: ${codeBlock}`);
+  } else {
+    console.log("일치하는 부분을 찾을 수 없습니다.");
+  }
+
+  return (
+    <CodeBlock
+      text={codeBlock}
+      language={language.toLowerCase()}
+      showLineNumbers={true}
+    />
+  );
 };
 
 const QnADetail = () => {
@@ -57,7 +95,9 @@ const QnADetail = () => {
     owner: "user",
     comment: "",
   });
+  const [codeComment, setCodeComment] = useState<string>("");
   const [commentList, setCommentList] = useState<CommentType[]>([]);
+  const [openCodeBlock, setOpenCodeBlock] = useState<boolean>(false);
   const [valid, setValid] = useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
@@ -95,7 +135,13 @@ const QnADetail = () => {
     setComment({ ...comment, comment: e.target.value });
   };
 
-  const handleCode = () => {};
+  const handleCodeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setCodeComment(e.target.value);
+  };
+
+  const handleCode = () => {
+    setOpenCodeBlock((prev) => !prev);
+  };
 
   const handleSubmit = () => {
     console.log("SUBMIT COMMENT");
@@ -154,6 +200,14 @@ const QnADetail = () => {
                 <StChatList>
                   {commentList.map((val, i) => {
                     const { owner, comment } = val;
+                    const showCodeBlock = comment.includes("```");
+                    console.log(showCodeBlock);
+                    const commentArr: string[] = [];
+                    if (showCodeBlock) {
+                      const regex = /(```[^`]+```)/; // 정규식 패턴
+                      const result = comment.split(regex); // 문자열을 정규식 패턴을 기준으로 분리
+                      commentArr.push(...result);
+                    }
                     return (
                       <li key={`${i}-${comment}`}>
                         <StAvatar>
@@ -163,7 +217,17 @@ const QnADetail = () => {
                             <BsChatLeftDotsFill />
                           )}
                         </StAvatar>
-                        <StComment>{comment}</StComment>
+                        <StComment>
+                          {showCodeBlock
+                            ? commentArr.map((val) =>
+                                val.includes("```") ? (
+                                  <CodeText text={val} lang="" />
+                                ) : (
+                                  val
+                                )
+                              )
+                            : comment}
+                        </StComment>
                       </li>
                     );
                   })}
@@ -180,10 +244,17 @@ const QnADetail = () => {
                 ref={contentRef}
                 autoComplete="off"
                 value={comment.comment}
-                onChange={(e) => handleComment(e)}
+                onChange={(e) =>
+                  openCodeBlock ? handleCodeComment(e) : handleComment(e)
+                }
                 rows={1}
                 placeholder="질문을 입력해 주세요."
               />
+              {openCodeBlock ? (
+                <CodeText text={codeComment} lang={"javascript"} />
+              ) : (
+                <></>
+              )}
               <StCodeBtn onClick={() => handleCode()}>
                 <BsCodeSlash fill={theme.colors.black02} />
               </StCodeBtn>
@@ -206,6 +277,7 @@ const QnADetail = () => {
             clickHandler={handleDelete}
             target="QnA"
             url="/qna-list"
+            id={"id"} // 임시
           />
         </ModalLayout>
       ) : (

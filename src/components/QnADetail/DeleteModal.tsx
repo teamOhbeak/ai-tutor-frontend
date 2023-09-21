@@ -3,18 +3,35 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import Button from "../elements/Button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteInterview } from "../../api/interviewApi";
 
 interface QnADeleteModalProps {
   clickHandler: () => void;
   target: string;
   url: string;
+  id: string;
 }
 
-const DeleteModal = ({ clickHandler, target, url }: QnADeleteModalProps) => {
+const DeleteModal = ({
+  clickHandler,
+  target,
+  url,
+  id,
+}: QnADeleteModalProps) => {
   const [confirm, setConfirm] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const handleNavigate = (target: string) => navigate(target);
+
+  const queryClient = useQueryClient();
+
+  const { mutate: handleDeleteInterview } = useMutation(deleteInterview, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["interviews"]);
+      setConfirm(true);
+    },
+  });
 
   return (
     <StContainer>
@@ -41,7 +58,7 @@ const DeleteModal = ({ clickHandler, target, url }: QnADeleteModalProps) => {
           <>
             <Button
               btnStatus="beige"
-              clickHandler={() => setConfirm(true)}
+              clickHandler={() => handleDeleteInterview(id)}
               disabled={false}
             >
               <span>삭제하기</span>
