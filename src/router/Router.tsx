@@ -6,6 +6,7 @@ import QnADetailPage from "../pages/QnADetailPage";
 import InterviewListPage from "../pages/InterviewListPage";
 import InterviewDetailPage from "../pages/InterviewDetailPage";
 import InterviewPage from "../pages/InterviewPage";
+import TestPage from "../pages/TestPage";
 
 const Router = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -28,6 +29,7 @@ const Router = () => {
             element={<InterviewDetailPage />}
           />
           <Route path="/interview" element={<InterviewPage />} />
+          <Route path="/test" element={<TestPage />} />
         </Routes>
       ) : (
         <></>

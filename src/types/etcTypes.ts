@@ -8,7 +8,8 @@ export type BtnStatusType =
 
 export type InputStatusType = "default" | "focus" | "valid" | "invalid";
 
-export type CommentType = {
-  owner: string;
-  comment: string;
+// TEST
+export type testStateType = {
+  user: string;
+  inProgress: boolean;
 };
