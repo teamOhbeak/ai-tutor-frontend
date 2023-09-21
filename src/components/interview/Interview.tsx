@@ -1,5 +1,8 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 import styled from "styled-components";
 import { BsChatLeftDotsFill, BsFillMicFill } from "react-icons/bs";
 import { FaUserAlt } from "react-icons/fa";
@@ -68,6 +71,8 @@ const Interview = () => {
   const [valid, setValid] = useState<boolean>(false);
   const [openDoneModal, setOpenDoneModal] = useState<boolean>(false);
 
+  const { transcript, resetTranscript } = useSpeechRecognition();
+
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -87,7 +92,34 @@ const Interview = () => {
   }, [interview.comment]);
 
   useEffect(() => {
-    // setTimer(TEST_DATA.timer);
+    if (voiceInterview) {
+      // 음성 인식 시작
+      console.log("음성 인식 시작");
+      SpeechRecognition.startListening({
+        continuous: true,
+        language: "ko",
+      });
+    } else {
+      // 음성 인식 중지
+      console.log("음성 인식 중지");
+      SpeechRecognition.stopListening();
+    }
+    return () => {
+      // 컴포넌트가 언마운트되면 음성 인식 중지
+      console.log("UNMOUNT");
+      // SpeechRecognition.abortListening();
+    };
+  }, [voiceInterview]);
+
+  // 음성 인식 결과 처리
+  useEffect(() => {
+    if (transcript) {
+      setInterview((prev) => ({ ...prev, comment: transcript }));
+      // resetTranscript(); // 음성인식 결과 처리 후 리셋
+    }
+  }, [transcript]);
+
+  useEffect(() => {
     if (interviewStatus === "progress") {
       if (timer !== 0) {
         const time = setInterval(() => {
@@ -98,12 +130,19 @@ const Interview = () => {
 
         return () => clearInterval(time);
       } else {
+        if (voiceInterview) {
+          setVoiceInterview(false);
+        }
         setTimerStatus("timeout");
       }
     }
   }, [timer, interviewStatus]);
 
   useEffect(() => {
+    setTimerStatus("progress");
+    setTimer(60 * Number(TEST_DATA.timer));
+    resetTranscript(); // 음성인식 결과 처리 후 리셋
+    setInterview({ ...interview, comment: "" });
     if (count === Number(TEST_DATA.maxQuestion)) {
       setInterviewStatus("done");
       setOpenDoneModal(true);
@@ -123,7 +162,7 @@ const Interview = () => {
   };
 
   const handleVoice = () => {
-    setVoiceInterview((prev) => !prev);
+    if (timerStatus !== "timeout") setVoiceInterview(!voiceInterview);
   };
 
   const handleSubmit = () => {
@@ -207,16 +246,17 @@ const Interview = () => {
                   onChange={(e) => handleInterview(e)}
                   rows={8}
                   placeholder="답변을 입력해 주세요."
+                  disabled={voiceInterview || timerStatus === "timeout"}
                 />
                 <StInterviewOptions>
-                  <StTimer timerStatus={timerStatus}>
+                  <StTimer $timerStatus={timerStatus}>
                     {Math.floor(timer / 60)
                       .toString()
                       .padStart(2, "0")}{" "}
                     : {(timer % 60).toString().padStart(2, "0")}
                   </StTimer>
                   <StVoice
-                    voiceInterview={voiceInterview}
+                    $voiceInterview={voiceInterview}
                     onClick={() => handleVoice()}
                   >
                     <BsFillMicFill
@@ -449,14 +489,14 @@ const StInterviewOptions = styled.div`
   height: 100%;
 `;
 
-const StTimer = styled.span<{ timerStatus: TimerStatusType }>`
-  color: ${({ timerStatus, theme }) =>
-    timerStatus === "timeout" ? theme.colors.red02 : theme.colors.black02};
+const StTimer = styled.span<{ $timerStatus: TimerStatusType }>`
+  color: ${({ $timerStatus, theme }) =>
+    $timerStatus === "timeout" ? theme.colors.red02 : theme.colors.black02};
   font-size: 16px;
   font-weight: 500;
 `;
 
-const StVoice = styled.div<{ voiceInterview: boolean }>`
+const StVoice = styled.div<{ $voiceInterview: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -470,8 +510,8 @@ const StVoice = styled.div<{ voiceInterview: boolean }>`
   }
 
   span {
-    color: ${({ voiceInterview, theme }) =>
-      voiceInterview ? theme.colors.red02 : theme.colors.gray01};
+    color: ${({ $voiceInterview, theme }) =>
+      $voiceInterview ? theme.colors.red02 : theme.colors.gray01};
     font-size: 14px;
     font-weight: 500;
   }

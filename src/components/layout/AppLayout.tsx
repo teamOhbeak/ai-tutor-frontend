@@ -29,7 +29,7 @@ const AppLayout = ({ showHeader, children }: AppLayoutProps) => {
 
   return (
     <StLayout>
-      <StNav showHeader={showHeader}>
+      <StNav $showHeader={showHeader}>
         <h1 onClick={() => handleNavigate("/")}>AI TUTOR</h1>
         <ul>
           {NAV_LIST.map((val) => {
@@ -37,7 +37,7 @@ const AppLayout = ({ showHeader, children }: AppLayoutProps) => {
             return (
               <StNavItem
                 key={btnText}
-                currentPage={location.pathname === url}
+                $currentPage={location.pathname === url}
                 onClick={() => handleNavigate(url)}
               >
                 <span>{btnText}</span>
@@ -61,8 +61,8 @@ const StLayout = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
 `;
 
-const StNav = styled.nav<{ showHeader: boolean }>`
-  display: ${({ showHeader }) => (showHeader ? "flex" : "none")};
+const StNav = styled.nav<{ $showHeader: boolean }>`
+  display: ${({ $showHeader }) => ($showHeader ? "flex" : "none")};
   align-items: center;
   justify-content: flex-start;
   width: 100%;
@@ -90,12 +90,12 @@ const StNav = styled.nav<{ showHeader: boolean }>`
   }
 `;
 
-const StNavItem = styled.li<{ currentPage: boolean }>`
+const StNavItem = styled.li<{ $currentPage: boolean }>`
   cursor: pointer;
 
   span {
-    color: ${({ theme, currentPage }) =>
-      currentPage ? theme.colors.red02 : theme.colors.black02};
+    color: ${({ theme, $currentPage }) =>
+      $currentPage ? theme.colors.red02 : theme.colors.black02};
     font-size: 18px;
     font-weight: 600;
   }

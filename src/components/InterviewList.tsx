@@ -85,7 +85,7 @@ const InterviewList = () => {
           {TEST_QNA.map((val, i, arr) => {
             const { title, username, createdAt } = val;
             return (
-              <StItem key={i} isLast={i === arr.length - 1}>
+              <StItem key={i} $isLast={i === arr.length - 1}>
                 <StInfo>
                   <StQnATitle>{createdAt}</StQnATitle>
                   <StSubInfo>
@@ -139,7 +139,7 @@ const StBody = styled.div`
 
 const StList = styled.ul``;
 
-const StItem = styled.li<{ isLast: boolean }>`
+const StItem = styled.li<{ $isLast: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -147,8 +147,8 @@ const StItem = styled.li<{ isLast: boolean }>`
   width: 100%;
   padding: 12px 24px;
   background-color: ${({ theme }) => theme.colors.white};
-  border-bottom: ${({ isLast, theme }) =>
-    isLast ? "none" : `1px solid ${theme.colors.gray03}`};
+  border-bottom: ${({ $isLast, theme }) =>
+    $isLast ? "none" : `1px solid ${theme.colors.gray03}`};
 `;
 
 const StInfo = styled.div`

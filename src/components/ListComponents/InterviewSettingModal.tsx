@@ -85,7 +85,7 @@ const InterviewSettingModal = ({
                   (_, i) => TECH_STACK_LIST[i]
                 ).map((val, idx) => (
                   <StOption
-                    isLast={idx === TECH_STACK_LIST.length - 1}
+                    $isLast={idx === TECH_STACK_LIST.length - 1}
                     key={val}
                     onClick={() => handleOption("techStack", val.toString())}
                   >
@@ -117,7 +117,7 @@ const InterviewSettingModal = ({
                 {Array.from({ length: MAX_QUESTION }, (_, i) => i + 1).map(
                   (val, idx) => (
                     <StOption
-                      isLast={idx === MAX_QUESTION - 1}
+                      $isLast={idx === MAX_QUESTION - 1}
                       key={val}
                       onClick={() =>
                         handleOption("maxQuestion", val.toString())
@@ -152,7 +152,7 @@ const InterviewSettingModal = ({
                 {Array.from({ length: MAX_TIMER }, (_, i) => i + 1).map(
                   (val, idx) => (
                     <StOption
-                      isLast={idx === MAX_TIMER - 1}
+                      $isLast={idx === MAX_TIMER - 1}
                       key={val}
                       onClick={() => handleOption("timer", val.toString())}
                     >
@@ -301,7 +301,7 @@ const StOptionContainer = styled.ul`
   overflow-y: scroll;
 `;
 
-const StOption = styled.li<{ isLast: boolean }>`
+const StOption = styled.li<{ $isLast: boolean }>`
   display: flex;
   align-items: center;
   width: 100%;
@@ -309,8 +309,8 @@ const StOption = styled.li<{ isLast: boolean }>`
   padding-left: 12px;
   background-color: ${({ theme }) => theme.colors.blue03};
   border-bottom: 1px solid
-    ${({ isLast, theme }) =>
-      isLast ? "transparent" : `${theme.colors.gray03}`};
+    ${({ $isLast, theme }) =>
+      $isLast ? "transparent" : `${theme.colors.gray03}`};
 
   span {
     color: ${({ theme }) => theme.colors.black02};

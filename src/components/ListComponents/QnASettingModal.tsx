@@ -30,7 +30,7 @@ const QnASettingModal = ({ clickHandler }: QnASettingModalProps) => {
         <h2>QnA 설정</h2>
       </StHeader>
       <StBody>
-        <StTitle inputStatus={inputStatus}>
+        <StTitle $inputStatus={inputStatus}>
           <label htmlFor="qna-title">제목</label>
           <input
             id="qna-title"
@@ -90,7 +90,7 @@ const StBody = styled.div`
   padding: 16px;
 `;
 
-const StTitle = styled.div<{ inputStatus: InputStatusType }>`
+const StTitle = styled.div<{ $inputStatus: InputStatusType }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -106,8 +106,8 @@ const StTitle = styled.div<{ inputStatus: InputStatusType }>`
     flex-grow: 1;
     padding: 8px;
     border: 1px solid
-      ${({ inputStatus, theme }) => {
-        switch (inputStatus) {
+      ${({ $inputStatus, theme }) => {
+        switch ($inputStatus) {
           case "default":
             return theme.colors.gray02;
           case "focus":

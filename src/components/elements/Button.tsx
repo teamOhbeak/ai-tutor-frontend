@@ -18,26 +18,26 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <StButton
-      btnStatus={btnStatus}
+      $btnStatus={btnStatus}
       onClick={() => clickHandler()}
       disabled={disabled}
     >
-      <StContent btnStatus={btnStatus}>{children}</StContent>
+      <StContent $btnStatus={btnStatus}>{children}</StContent>
     </StButton>
   );
 };
 
 export default Button;
 
-const StButton = styled.button<{ btnStatus: BtnStatusType }>`
+const StButton = styled.button<{ $btnStatus: BtnStatusType }>`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   padding: 16px;
   gap: 10px;
-  background-color: ${({ theme, btnStatus }) => {
-    switch (btnStatus) {
+  background-color: ${({ theme, $btnStatus }) => {
+    switch ($btnStatus) {
       case "primary01":
         return theme.colors.red02;
       case "primary02":
@@ -54,13 +54,13 @@ const StButton = styled.button<{ btnStatus: BtnStatusType }>`
   }};
   border: none;
   border-radius: 12px;
-  cursor: ${({ btnStatus }) =>
-    btnStatus === "disabled" ? "not-allowed" : "pointer"};
+  cursor: ${({ $btnStatus }) =>
+    $btnStatus === "disabled" ? "not-allowed" : "pointer"};
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: ${({ theme, btnStatus }) => {
-      switch (btnStatus) {
+    background-color: ${({ theme, $btnStatus }) => {
+      switch ($btnStatus) {
         case "primary01":
           return theme.colors.red01;
         case "primary02":
@@ -79,7 +79,7 @@ const StButton = styled.button<{ btnStatus: BtnStatusType }>`
 `;
 
 const StContent = styled.div<{
-  btnStatus: BtnStatusType;
+  $btnStatus: BtnStatusType;
 }>`
   display: flex;
   align-items: center;
@@ -87,8 +87,8 @@ const StContent = styled.div<{
   width: 100%;
 
   span {
-    color: ${({ theme, btnStatus }) => {
-      switch (btnStatus) {
+    color: ${({ theme, $btnStatus }) => {
+      switch ($btnStatus) {
         case "primary01":
           return theme.colors.white;
         case "primary02":
