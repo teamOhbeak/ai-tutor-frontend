@@ -1,6 +1,6 @@
 import React from "react";
 import AppLayout from "../components/layout/AppLayout";
-import QnADetail from "../components/QnADetail/QnADetail";
+import QnADetail from "../components/qnaDetail/QnADetail";
 
 const QnADetailPage = () => {
   return (

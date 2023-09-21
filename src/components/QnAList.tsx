@@ -3,9 +3,9 @@ import styled from "styled-components";
 import Button from "./elements/Button";
 import { useNavigate } from "react-router-dom";
 import { WINDOW_H } from "../styles/theme";
-import ListHeader from "./ListComponents/ListHeader";
+import ListHeader from "./listComponents/ListHeader";
 import ModalLayout from "./layout/ModalLayout";
-import QnASettingModal from "./ListComponents/QnASettingModal";
+import QnASettingModal from "./listComponents/QnASettingModal";
 
 const TEST_QNA = [
   {

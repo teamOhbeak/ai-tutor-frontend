@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import ModalLayout from "./layout/ModalLayout";
-import ListHeader from "./ListComponents/ListHeader";
-import InterviewSettingModal from "./ListComponents/InterviewSettingModal";
+import ListHeader from "./listComponents/ListHeader";
+import InterviewSettingModal from "./listComponents/InterviewSettingModal";
 import Button from "./elements/Button";
 import { getInterviews } from "../api/interviewApi";
 import { InterviewListType } from "../types/interviewTypes";
