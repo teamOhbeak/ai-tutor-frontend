@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import { useReactMediaRecorder } from "react-media-recorder";
+import Webcam from "react-webcam";
 import styled from "styled-components";
 import { BsChatLeftDotsFill, BsFillMicFill } from "react-icons/bs";
 import { FaUserAlt } from "react-icons/fa";
@@ -64,6 +66,7 @@ const Interview = () => {
     comment: "",
   });
   const [interviewList, setInterviewList] = useState<CommentType[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
   const [voiceInterview, setVoiceInterview] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(60 * Number(TEST_DATA.timer));
   const [timerStatus, setTimerStatus] = useState<TimerStatusType>("default");
@@ -77,6 +80,8 @@ const Interview = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
+  const { status, startRecording, stopRecording, mediaBlobUrl } =
+    useReactMediaRecorder({ video: true });
 
   // test
   useEffect(() => {
@@ -165,6 +170,41 @@ const Interview = () => {
     if (timerStatus !== "timeout") setVoiceInterview(!voiceInterview);
   };
 
+  const handleStartRecording = () => {
+    startRecording();
+    setIsRecording(true);
+  };
+
+  const handleStopRecording = () => {
+    stopRecording();
+    setIsRecording(false);
+  };
+
+  const handleSaveVideo = () => {
+    const url = mediaBlobUrl;
+    console.log(url);
+    if (url) {
+      const newDate = new Date();
+      const yy = newDate.getFullYear();
+      const mm = (newDate.getMonth() + 1).toString().padStart(2, "0");
+      const dd = newDate.getDate().toString().padStart(2, "0");
+      const current = `${yy}${mm}${dd}`;
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ai_interview_${current}`; // 파일 이름 설정
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const videoConstraints = {
+    width: 600,
+    height: 400,
+    facingMode: "user",
+  };
+
   const handleSubmit = () => {
     setCount((prev) => prev + 1);
   };
@@ -191,11 +231,43 @@ const Interview = () => {
               <span>나가기</span>
             </Button>
           </StCancelBtn>
+          <StCancelBtn>
+            <Button
+              btnStatus="cancel"
+              clickHandler={() =>
+                isRecording ? handleStopRecording() : handleStartRecording()
+              }
+              disabled={false}
+            >
+              <span>녹화</span>
+            </Button>
+          </StCancelBtn>
+          <StCancelBtn>
+            <Button
+              btnStatus="cancel"
+              clickHandler={() => handleSaveVideo()}
+              disabled={false}
+            >
+              <span>녹화 저장</span>
+            </Button>
+          </StCancelBtn>
         </StHeaderBtnWrapper>
       </StHeader>
       <StBody>
         <StViewContainer>
-          <StScreenContainer ref={scrollRef}></StScreenContainer>
+          <StScreenContainer ref={scrollRef}>
+            {isRecording ? (
+              <Webcam
+                audio={false}
+                mirrored={true}
+                // height={400}
+                // width={600}
+                videoConstraints={videoConstraints}
+              />
+            ) : (
+              <StEmptyScreen />
+            )}
+          </StScreenContainer>
           <StPrompt>
             {loading ? (
               <></>
@@ -366,6 +438,16 @@ const StViewContainer = styled.div`
 const StScreenContainer = styled.div`
   width: 600px;
   height: 400px;
+
+  video {
+    width: 100%;
+    height: 100%;
+  }
+`;
+
+const StEmptyScreen = styled.div`
+  width: 100%;
+  height: 100%;
   background-color: ${({ theme }) => theme.colors.black01};
 `;
 

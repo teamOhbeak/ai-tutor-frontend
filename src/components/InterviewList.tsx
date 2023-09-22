@@ -34,14 +34,14 @@ const InterviewList = () => {
           <StBody>
             <StList>
               {(data as InterviewListType[]).map((val, i, arr) => {
-                const { id, createdAt, username, status } = val;
+                const { id, createdAt, userName, status } = val;
                 return (
                   <StItem key={id} $isLast={i === arr.length - 1}>
                     <StInfo>
                       <StQnATitle>{createdAt}</StQnATitle>
-                      {/* <StSubInfo>
-                        <StQnAUsername>{username}</StQnAUsername>
-                      </StSubInfo> */}
+                      <StSubInfo>
+                        <StQnAUsername>{userName}</StQnAUsername>
+                      </StSubInfo>
                     </StInfo>
                     <StBtnWrapper>
                       <Button

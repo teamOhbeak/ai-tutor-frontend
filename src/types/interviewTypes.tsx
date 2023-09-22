@@ -1,8 +1,14 @@
 export type InterviewListType = {
   id: number;
   createdAt: string;
-  username?: string;
+  userName: string;
   status: string;
+};
+
+export type InterviewSettingType = {
+  stack: string;
+  questionCount: number;
+  maxWait: number;
 };
 
 export type InterviewAnswerType = {
