@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import ModalLayout from "./layout/ModalLayout";
-import ListHeader from "./listComponents/ListHeader";
-import QnASettingModal from "./listComponents/QnASettingModal";
+import ListHeader from "./ListComponents/ListHeader";
+import QnASettingModal from "./ListComponents/QnASettingModal";
 import Button from "./elements/Button";
 import { getQnARooms } from "../api/qnaApi";
 import { QnAListType } from "../types/QnATypes";

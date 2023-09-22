@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { BsFillTrashFill } from "react-icons/bs";
 
 import ModalLayout from "./layout/ModalLayout";
-import DeleteModal from "./qnaDetail/DeleteModal";
+import DeleteModal from "./QnADetail/DeleteModal";
 import Button from "./elements/Button";
 import InterviewItem from "./elements/InterviewItem";
 import { getInterview } from "../api/interviewApi";

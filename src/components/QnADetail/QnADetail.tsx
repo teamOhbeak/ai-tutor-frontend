@@ -13,11 +13,11 @@ import {
 import { FaUserAlt } from "react-icons/fa";
 
 import ModalLayout from "../layout/ModalLayout";
-import DeleteModal from "./DeleteModal";
 import Button from "../elements/Button";
 import { getQnARoom } from "../../api/qnaApi";
 import { CommentType } from "../../types/QnATypes";
 import { WINDOW_H, theme } from "../../styles/theme";
+import DeleteModal from "./DeleteModal";
 
 const TEST_DATA = {
   title: "React suspense 사용 방법",
