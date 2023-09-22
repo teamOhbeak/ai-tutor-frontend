@@ -5,10 +5,11 @@ import styled from "styled-components";
 import Button from "../elements/Button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteInterview } from "../../api/interviewApi";
+import { deleteQnARoom } from "../../api/qnaApi";
 
 interface QnADeleteModalProps {
   clickHandler: () => void;
-  target: string;
+  target: "QnA" | "Interview";
   url: string;
   id: string;
 }
@@ -25,6 +26,13 @@ const DeleteModal = ({
   const handleNavigate = (target: string) => navigate(target);
 
   const queryClient = useQueryClient();
+
+  const { mutate: handleDeleteQnA } = useMutation(deleteQnARoom, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["qnaRooms"]);
+      setConfirm(true);
+    },
+  });
 
   const { mutate: handleDeleteInterview } = useMutation(deleteInterview, {
     onSuccess: () => {
@@ -58,7 +66,11 @@ const DeleteModal = ({
           <>
             <Button
               btnStatus="beige"
-              clickHandler={() => handleDeleteInterview(id)}
+              clickHandler={() =>
+                target === "QnA"
+                  ? handleDeleteQnA(id)
+                  : handleDeleteInterview(id)
+              }
               disabled={false}
             >
               <span>삭제하기</span>

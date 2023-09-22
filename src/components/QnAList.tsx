@@ -1,114 +1,72 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-import Button from "./elements/Button";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { WINDOW_H } from "../styles/theme";
-import ListHeader from "./listComponents/ListHeader";
-import ModalLayout from "./layout/ModalLayout";
-import QnASettingModal from "./listComponents/QnASettingModal";
+import styled from "styled-components";
 
-const TEST_QNA = [
-  {
-    title:
-      "title title title title title title title title title titletitle title title title title title title title title titletitle title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title ",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title ",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-  {
-    title: "title title title title title title title title title title",
-    username: "user12345",
-    createdAt: "2023-09-19",
-  },
-];
+import ModalLayout from "./layout/ModalLayout";
+import ListHeader from "./listComponents/ListHeader";
+import QnASettingModal from "./listComponents/QnASettingModal";
+import Button from "./elements/Button";
+import { getQnARooms } from "../api/qnaApi";
+import { QnAListType } from "../types/QnATypes";
+import { WINDOW_H } from "../styles/theme";
+
 const QnAList = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const handleNavigate = (target: string) => navigate(target);
 
+  const { data, isLoading, isSuccess } = useQuery(["qnaRooms"], () =>
+    getQnARooms()
+  );
+
   return (
     <StContainer>
-      <ListHeader
-        title="QnA List"
-        btnText="질문하기"
-        clickHandler={() => setOpenModal(true)}
-      />
-      <StBody>
-        <StList>
-          {TEST_QNA.map((val, i, arr) => {
-            const { title, username, createdAt } = val;
-            return (
-              <StItem key={i} $isLast={i === arr.length - 1}>
-                <StInfo>
-                  <StQnATitle>{title}</StQnATitle>
-                  <StSubInfo>
-                    <StQnAUsername>{username}</StQnAUsername>
-                    <StQnADate>{createdAt}</StQnADate>
-                  </StSubInfo>
-                </StInfo>
-                <StBtnWrapper>
-                  <Button
-                    btnStatus="beige"
-                    clickHandler={() => handleNavigate("/qna-detail/new")}
-                    disabled={false}
-                  >
-                    <span>상세보기</span>
-                  </Button>
-                </StBtnWrapper>
-              </StItem>
-            );
-          })}
-        </StList>
-      </StBody>
-      {openModal ? (
-        <ModalLayout width="480px" height="auto">
-          <QnASettingModal clickHandler={() => setOpenModal(false)} />
-        </ModalLayout>
+      {!isLoading && isSuccess ? (
+        <>
+          <ListHeader
+            title="QnA List"
+            btnText="질문하기"
+            clickHandler={() => setOpenModal(true)}
+          />
+          <StBody>
+            <StList>
+              {(data as QnAListType[]).map((val, i, arr) => {
+                const { title, username, createdAt, id } = val;
+                return (
+                  <StItem key={id} $isLast={i === arr.length - 1}>
+                    <StInfo>
+                      <StQnATitle>{title}</StQnATitle>
+                      <StSubInfo>
+                        <StQnAUsername>
+                          {username ? username : ""}
+                        </StQnAUsername>
+                        <StQnADate>{createdAt}</StQnADate>
+                      </StSubInfo>
+                    </StInfo>
+                    <StBtnWrapper>
+                      <Button
+                        btnStatus="beige"
+                        clickHandler={() => handleNavigate(`/qna-detail/${id}`)}
+                        disabled={false}
+                      >
+                        <span>상세보기</span>
+                      </Button>
+                    </StBtnWrapper>
+                  </StItem>
+                );
+              })}
+            </StList>
+          </StBody>
+          {openModal ? (
+            <ModalLayout width="480px" height="auto">
+              <QnASettingModal clickHandler={() => setOpenModal(false)} />
+            </ModalLayout>
+          ) : (
+            <></>
+          )}
+        </>
       ) : (
         <></>
       )}

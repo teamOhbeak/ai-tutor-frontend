@@ -3,6 +3,8 @@ import styled from "styled-components";
 import Button from "../elements/Button";
 import { useNavigate } from "react-router-dom";
 import { InputStatusType } from "../../types/etcTypes";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { postQnARoom } from "../../api/qnaApi";
 
 interface QnASettingModalProps {
   clickHandler: () => void;
@@ -15,10 +17,18 @@ const QnASettingModal = ({ clickHandler }: QnASettingModalProps) => {
 
   const navigate = useNavigate();
   const handleNavigate = (target: string) => navigate(target);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     title.trim().length > 0 ? setValid(true) : setValid(false);
   }, [title]);
+
+  const { mutate: handleNewQnARoom } = useMutation(postQnARoom, {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(["qnaRooms"]);
+      handleNavigate(`/qna-detail/${data.id}`);
+    },
+  });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -55,7 +65,7 @@ const QnASettingModal = ({ clickHandler }: QnASettingModalProps) => {
         </Button>
         <Button
           btnStatus={valid ? "primary01" : "disabled"}
-          clickHandler={() => handleNavigate("/qna-detail/new")}
+          clickHandler={() => handleNewQnARoom({ userId: 0, title })}
           disabled={!valid}
         >
           <span>질문하기</span>

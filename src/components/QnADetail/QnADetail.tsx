@@ -1,7 +1,10 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { CodeBlock, dracula } from "react-code-blocks";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
+import { CodeBlock } from "react-code-blocks";
 import styled from "styled-components";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   BsFillTrashFill,
   BsChatLeftDotsFill,
@@ -12,6 +15,7 @@ import { FaUserAlt } from "react-icons/fa";
 import ModalLayout from "../layout/ModalLayout";
 import DeleteModal from "./DeleteModal";
 import Button from "../elements/Button";
+import { getQnARoom } from "../../api/qnaApi";
 import { CommentType } from "../../types/QnATypes";
 import { WINDOW_H, theme } from "../../styles/theme";
 
@@ -104,15 +108,31 @@ const QnADetail = () => {
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const params = useParams();
 
   // test
   useEffect(() => {
     setCommentList(TEST_DATA.chat);
+    if (params.id) refetch();
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    // 텍스트 내용이 변경될 때마다 처리
+    // ```를 입력하면 마크다운으로 렌더링
+    const text = comment.comment;
+    const codeBlockRegex = /```([\s\S]*?)```/g;
+    const processedText = text.replace(
+      codeBlockRegex,
+      (_, code) => `\n\`\`\`\n${code}\n\`\`\`\n`
+    );
+    console.log(processedText);
+    setCodeComment(processedText);
+    // setComment({ ...comment, comment: processedText });
+  }, [comment.comment]);
 
   useEffect(() => {
     comment.comment.trim().length > 0 ? setValid(true) : setValid(false);
@@ -126,6 +146,16 @@ const QnADetail = () => {
           : `${contentRef.current.scrollHeight}px`;
     }
   }, [comment]);
+
+  // 추후 확인 필요
+  const { refetch, data, isLoading, isSuccess } = useQuery(
+    ["qnaRoom"],
+    () => getQnARoom(params.id as string),
+    {
+      onSuccess: (data) => console.log("QNA DATA >> ", data),
+      enabled: false,
+    }
+  );
 
   const handleNavigate = (target: string) => {
     navigate(target);
@@ -201,7 +231,7 @@ const QnADetail = () => {
                   {commentList.map((val, i) => {
                     const { owner, comment } = val;
                     const showCodeBlock = comment.includes("```");
-                    console.log(showCodeBlock);
+                    // console.log(showCodeBlock);
                     const commentArr: string[] = [];
                     if (showCodeBlock) {
                       const regex = /(```[^`]+```)/; // 정규식 패턴
@@ -250,6 +280,12 @@ const QnADetail = () => {
                 rows={1}
                 placeholder="질문을 입력해 주세요."
               />
+              <div className="markdown-preview">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  children={codeComment}
+                />
+              </div>
               {openCodeBlock ? (
                 <CodeText text={codeComment} lang={"javascript"} />
               ) : (
