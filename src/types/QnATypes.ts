@@ -6,8 +6,22 @@ export type QnAListType = {
 };
 
 export type newQnARoomType = {
-  userId: number;
   title: string;
+};
+
+export type qnaType = {
+  id: number;
+  question: string;
+  answer: string;
+  sequence: number;
+};
+
+export type qnaRoomType = {
+  id: number;
+  title: string;
+  username: string;
+  createdAt: string;
+  qnas: qnaType[];
 };
 
 export type newQuestionType = {

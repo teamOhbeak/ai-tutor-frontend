@@ -1,6 +1,6 @@
 import React from "react";
-import { useRecoilState } from "recoil";
 import styled from "styled-components";
+
 import { BtnStatusType } from "../../types/etcTypes";
 
 interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
@@ -16,10 +16,15 @@ const Button = ({
   disabled,
   children,
 }: ButtonProps) => {
+  const handleEnter = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "Enter") clickHandler();
+  };
+
   return (
     <StButton
       $btnStatus={btnStatus}
       onClick={() => clickHandler()}
+      onKeyDown={(e) => handleEnter(e)}
       disabled={disabled}
     >
       <StContent $btnStatus={btnStatus}>{children}</StContent>

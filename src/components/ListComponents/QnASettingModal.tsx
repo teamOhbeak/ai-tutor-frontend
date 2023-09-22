@@ -1,9 +1,10 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import styled from "styled-components";
-import Button from "../elements/Button";
-import { useNavigate } from "react-router-dom";
-import { InputStatusType } from "../../types/etcTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+import Button from "../elements/Button";
+import { InputStatusType } from "../../types/etcTypes";
 import { postQnARoom } from "../../api/qnaApi";
 
 interface QnASettingModalProps {
@@ -16,7 +17,6 @@ const QnASettingModal = ({ clickHandler }: QnASettingModalProps) => {
   const [inputStatus, setInputStatus] = useState<InputStatusType>("default");
 
   const navigate = useNavigate();
-  const handleNavigate = (target: string) => navigate(target);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -29,6 +29,8 @@ const QnASettingModal = ({ clickHandler }: QnASettingModalProps) => {
       handleNavigate(`/qna-detail/${data.id}`);
     },
   });
+
+  const handleNavigate = (target: string) => navigate(target);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -65,7 +67,7 @@ const QnASettingModal = ({ clickHandler }: QnASettingModalProps) => {
         </Button>
         <Button
           btnStatus={valid ? "primary01" : "disabled"}
-          clickHandler={() => handleNewQnARoom({ userId: 0, title })}
+          clickHandler={() => handleNewQnARoom({ title })}
           disabled={!valid}
         >
           <span>질문하기</span>

@@ -1,5 +1,5 @@
-import { newQnARoomType, newQuestionType } from "../types/QnATypes";
 import { instance } from "./api";
+import { newQnARoomType, newQuestionType } from "../types/QnATypes";
 
 export const getQnARooms = async () => {
   try {
@@ -45,9 +45,12 @@ export const getQnA = async (id: string) => {
   }
 };
 
-export const postQnA = async (id: string, data: newQuestionType) => {
+export const postQnA = async (data: newQuestionType) => {
   try {
-    const res = await instance.post(`/api/qna-rooms/${id}/questions`, data);
+    const res = await instance.post(
+      `/api/qna-rooms/${data.roomId}/questions`,
+      data
+    );
     return res.data;
   } catch (err) {
     throw err;
