@@ -179,7 +179,8 @@ const Interview = () => {
     {
       onSuccess: (data: InterviewRoomType) => {
         setInterviewRoomData(data);
-        data.record ? setShowScreen(true) : setShowScreen(false);
+        // data.record ? setShowScreen(true) : setShowScreen(false);
+        setShowScreen(true);
         setQuestions(data.questions);
         setTimer(data.maxWait * 60);
         console.log("DATA >> ", data);
@@ -268,9 +269,10 @@ const Interview = () => {
       answerText: answer,
     });
 
-    if (questionStatus === "followUp2") {
-      setCount((prev) => prev + 1);
-    }
+    setCount((prev) => prev + 1);
+    // if (questionStatus === "followUp2") {
+    //   setCount((prev) => prev + 1);
+    // }
   };
 
   const handlePass = () => {
