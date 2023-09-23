@@ -1,48 +1,62 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
-import { CodeBlock } from "react-code-blocks";
-import styled from "styled-components";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react"
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query"
+import { useNavigate, useParams } from "react-router-dom"
+import { CodeBlock } from "react-code-blocks"
+import styled from "styled-components"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import {
   BsFillTrashFill,
   BsChatLeftDotsFill,
   BsCodeSlash,
-} from "react-icons/bs";
-import { FaUserAlt } from "react-icons/fa";
+} from "react-icons/bs"
+import { FaUserAlt } from "react-icons/fa"
 
-import ModalLayout from "../layout/ModalLayout";
-import DeleteModal from "./DeleteModal";
-import Button from "../elements/Button";
-import LoadingSpinner from "../elements/LoadingSpinner";
-import LoadingEllipsis from "../elements/LoadingEllipsis";
-import { getQnA, getQnARoom, postQnA } from "../../api/qnaApi";
-import { newQuestionType, qnaRoomType, qnaType } from "../../types/QnATypes";
-import { WINDOW_H, theme } from "../../styles/theme";
+import ModalLayout from "../layout/ModalLayout"
+import DeleteModal from "./DeleteModal"
+import Button from "../elements/Button"
+import LoadingSpinner from "../elements/LoadingSpinner"
+import LoadingEllipsis from "../elements/LoadingEllipsis"
+import { getQnA, getQnARoom, postQnA } from "../../api/qnaApi"
+import { newQuestionType, qnaRoomType, qnaType } from "../../types/QnATypes"
+import { WINDOW_H, theme } from "../../styles/theme"
+import { dark } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter"
+
+import typescript from "react-syntax-highlighter/dist/esm/languages/prism/typescript"
+import javascript from "react-syntax-highlighter/dist/esm/languages/prism/javascript"
+import java from "react-syntax-highlighter/dist/esm/languages/prism/java"
+import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx"
+
+import a11yDark from "react-syntax-highlighter/dist/esm/styles/prism/a11y-dark"
+
+SyntaxHighlighter.registerLanguage("typescript", typescript)
+SyntaxHighlighter.registerLanguage("javascript", javascript)
+SyntaxHighlighter.registerLanguage("java", java)
+SyntaxHighlighter.registerLanguage("jsx", jsx)
 
 interface CodeTextProps {
-  text: string;
-  lang: string;
+  text: string
+  lang: string
 }
 
 const CodeText = ({ text, lang }: CodeTextProps) => {
-  console.log(text);
-  const str = text;
-  const regex = /```(\w+)\s(.*?)```/s; // 정규식 패턴
+  console.log(text)
+  const str = text
+  const regex = /```(\w+)\s(.*?)```/s // 정규식 패턴
 
-  const match = str.match(regex); // 문자열에서 패턴과 일치하는 부분을 찾음
+  const match = str.match(regex) // 문자열에서 패턴과 일치하는 부분을 찾음
 
-  let language: string = "";
-  let codeBlock: string = "";
+  let language: string = ""
+  let codeBlock: string = ""
 
   if (match) {
-    language = match[1]; // 언어 부분을 가져옴
-    codeBlock = match[2]; // 코드 블록 부분을 가져옴
-    console.log(`언어: ${language}`);
-    console.log(`코드 블록: ${codeBlock}`);
+    language = match[1] // 언어 부분을 가져옴
+    codeBlock = match[2] // 코드 블록 부분을 가져옴
+    console.log(`언어: ${language}`)
+    console.log(`코드 블록: ${codeBlock}`)
   } else {
-    console.log("일치하는 부분을 찾을 수 없습니다.");
+    console.log("일치하는 부분을 찾을 수 없습니다.")
   }
 
   return (
@@ -51,103 +65,135 @@ const CodeText = ({ text, lang }: CodeTextProps) => {
       language={language.toLowerCase()}
       showLineNumbers={true}
     />
-  );
-};
+  )
+}
 
 const QnADetail = () => {
-  const [chatLoading, setChatLoading] = useState<boolean>(false);
+  const [chatLoading, setChatLoading] = useState<boolean>(false)
   const [qnaRoomData, setQnARoomData] = useState<qnaRoomType>({
     id: 0,
     title: "string",
     username: "string",
     createdAt: "string",
     qnas: [],
-  });
-  const [qnaData, setQnAData] = useState<qnaType[]>([]);
+  })
+  const [qnaData, setQnAData] = useState<qnaType[]>([])
   const [question, setQuestion] = useState<newQuestionType>({
     roomId: 0,
     question: "",
-  });
-  const [codeQuestion, setCodeQuestion] = useState<string>("");
-  const [openCodeBlock, setOpenCodeBlock] = useState<boolean>(false);
-  const [valid, setValid] = useState<boolean>(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
+  })
+  const divRef = useRef(null)
 
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [codeQuestion, setCodeQuestion] = useState<string>("")
+  const [openCodeBlock, setOpenCodeBlock] = useState<boolean>(false)
+  const [valid, setValid] = useState<boolean>(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false)
 
-  const navigate = useNavigate();
-  const params = useParams();
+  const contentRef = useRef<HTMLTextAreaElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
-  const queryClient = new QueryClient();
+  const navigate = useNavigate()
+  const params = useParams()
+
+  const queryClient = new QueryClient()
 
   // test
   useEffect(() => {
-    setQuestion({ ...question, roomId: Number(params.id) });
-    if (params.id) refetch();
-  }, []);
+    setQuestion({ ...question, roomId: Number(params.id) })
+    if (params.id) refetch()
+  }, [])
 
   useEffect(() => {
-    question.question.trim().length > 0 ? setValid(true) : setValid(false);
+    question.question.trim().length > 0 ? setValid(true) : setValid(false)
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
     if (contentRef.current) {
       contentRef.current.style.height =
         contentRef.current.scrollHeight > 100
           ? "100px"
-          : `${contentRef.current.scrollHeight}px`;
+          : `${contentRef.current.scrollHeight}px`
     }
-  }, [question]);
+  }, [question])
 
   const { refetch, isLoading, isSuccess } = useQuery(
     ["qnaRoom"],
     () => getQnARoom(params.id as string),
     {
       onSuccess: (data: qnaRoomType) => {
-        setQnARoomData(data);
-        setQnAData(data.qnas);
-        console.log("GET SUCCESS");
+        setQnARoomData(data)
+
+        data.qnas.map((data) => {
+          const regex = /```(\w+)\s(.*?)```/s // 정규식 패턴
+
+          const match = data.answer.match(regex) // 문자열에서 패턴과 일치하는 부분을 찾음
+
+          let language: string = ""
+
+          if (match) {
+            language = match[1] // 언어 부분을 가져옴
+            data.language = language.toLocaleLowerCase()
+            data.code = match[2] // 코드 블록 부분을 가져옴
+            data.answer = data.answer.replace(regex, "")
+          }
+        })
+
+        setQnAData(data.qnas)
+        console.log("GET SUCCESS")
       },
       enabled: false,
     }
-  );
+  )
 
   const { refetch: qnaRefetch } = useQuery(
     ["qna"],
     () => getQnA(params.id as string),
     {
       onSuccess: (data: qnaType[]) => {
-        setQnAData(data);
-        setChatLoading(false);
-        console.log("GET QNA DATA SUCCESS");
+        data.map((data) => {
+          const regex = /```(\w+)\s(.*?)```/s // 정규식 패턴
+
+          const match = data.answer.match(regex) // 문자열에서 패턴과 일치하는 부분을 찾음
+
+          let language: string = ""
+
+          if (match) {
+            language = match[1] // 언어 부분을 가져옴
+            data.language = language.toLocaleLowerCase()
+            data.code = match[2] // 코드 블록 부분을 가져옴
+            data.answer = data.answer.replace(regex, "")
+          }
+        })
+        setQnAData(data)
+        setChatLoading(false)
+        console.log("GET QNA DATA SUCCESS")
       },
       enabled: false,
     }
-  );
+  )
 
   const { mutate: handleNewQuestion } = useMutation(postQnA, {
     onSuccess: (data) => {
-      setQuestion({ ...question, question: "" });
-      qnaRefetch();
-      handleScroll();
-      console.log("POST SUCCESS");
+      setQuestion({ ...question, question: "" })
+      qnaRefetch()
+      handleScroll()
+      console.log("POST SUCCESS")
     },
-  });
+  })
 
   const handleScroll = () => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  };
+  }
 
   const handleNavigate = (target: string) => {
-    navigate(target);
-  };
+    navigate(target)
+  }
 
   const handleQuestion = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setQuestion({ ...question, question: e.target.value });
-  };
+    setQuestion({ ...question, question: e.target.value })
+  }
 
   // const handleCodeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
   //   setCodeQuestion(e.target.value);
@@ -158,10 +204,10 @@ const QnADetail = () => {
   // };
 
   const handleSubmit = () => {
-    setChatLoading(true);
-    handleScroll();
-    handleNewQuestion(question);
-  };
+    setChatLoading(true)
+    handleScroll()
+    handleNewQuestion(question)
+  }
 
   return (
     <StContainer>
@@ -207,7 +253,8 @@ const QnADetail = () => {
                 <StChatList>
                   <>
                     {qnaData.map((val, i) => {
-                      const { id, question, answer, sequence } = val;
+                      const { id, question, answer, sequence, code, language } =
+                        val
                       return (
                         <li key={`${i}-${id}`}>
                           <StChatWrapper>
@@ -220,10 +267,21 @@ const QnADetail = () => {
                             <StAvatar>
                               <BsChatLeftDotsFill />
                             </StAvatar>
-                            <StChat>{answer}</StChat>
+                            <StChat>
+                              {answer}
+                              {code && (
+                                <SyntaxHighlighter
+                                  language={language}
+                                  style={dark}
+                                  showLineNumbers={true}
+                                >
+                                  {code}
+                                </SyntaxHighlighter>
+                              )}
+                            </StChat>
                           </StChatWrapper>
                         </li>
-                      );
+                      )
                     })}
                     {chatLoading ? <LoadingEllipsis /> : <></>}
                   </>
@@ -289,17 +347,17 @@ const QnADetail = () => {
         </>
       )}
     </StContainer>
-  );
-};
+  )
+}
 
-export default QnADetail;
+export default QnADetail
 
 const StContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
   height: ${WINDOW_H}px;
-`;
+`
 
 const StHeader = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
@@ -317,7 +375,7 @@ const StHeader = styled.div`
     font-size: 24px;
     font-weight: 500;
   }
-`;
+`
 
 const StInfo = styled.div`
   display: flex;
@@ -325,7 +383,7 @@ const StInfo = styled.div`
   justify-content: flex-start;
   gap: 8px;
   width: calc(100% - 116px);
-`;
+`
 
 const StTitle = styled.h3`
   overflow: hidden;
@@ -336,41 +394,41 @@ const StTitle = styled.h3`
   font-family: "NanumSquareNeo";
   font-size: 18px;
   font-weight: 500;
-`;
+`
 
 const StSubInfo = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-`;
+`
 
 const StUsername = styled.span`
   color: ${({ theme }) => theme.colors.gray01};
   font-size: 14px;
   font-weight: 400;
-`;
+`
 
 const StDate = styled.span`
   color: ${({ theme }) => theme.colors.gray02};
   font-size: 14px;
   font-weight: 400;
-`;
+`
 
 const StHeaderBtnWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-`;
+`
 
 const StDeleteBtn = styled.div`
   width: 60px;
-`;
+`
 
 const StCancelBtn = styled.div`
   width: 100px;
-`;
+`
 
 const StBody = styled.div`
   display: flex;
@@ -380,7 +438,7 @@ const StBody = styled.div`
   width: 100%;
   height: ${WINDOW_H - 100}px;
   padding: 24px 48px;
-`;
+`
 
 const StChatContainer = styled.div`
   width: 100%;
@@ -389,7 +447,7 @@ const StChatContainer = styled.div`
   padding: 16px;
   overflow: scroll;
   border-radius: 8px;
-`;
+`
 
 const StChatListGuide = styled.div`
   padding: 16px;
@@ -402,7 +460,7 @@ const StChatListGuide = styled.div`
     font-size: 14px;
     font-weight: 500;
   }
-`;
+`
 
 const StChatList = styled.ul`
   display: flex;
@@ -414,14 +472,14 @@ const StChatList = styled.ul`
     flex-direction: column;
     gap: 16px;
   }
-`;
+`
 
 const StChatWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-`;
+`
 
 const StAvatar = styled.div`
   display: flex;
@@ -435,7 +493,7 @@ const StAvatar = styled.div`
     width: 16px;
     height: 16px;
   }
-`;
+`
 
 const StChat = styled.p`
   padding: 16px;
@@ -443,7 +501,7 @@ const StChat = styled.p`
   background-color: ${({ theme }) => theme.colors.white};
   white-space: pre-wrap;
   word-break: keep-all;
-`;
+`
 
 const StNewChatContainer = styled.div`
   display: flex;
@@ -453,7 +511,7 @@ const StNewChatContainer = styled.div`
   padding: 12px;
   background-color: ${({ theme }) => theme.colors.blue03};
   border-radius: 8px;
-`;
+`
 
 const StNewChat = styled.div`
   flex-grow: 1;
@@ -468,7 +526,7 @@ const StNewChat = styled.div`
     font-size: 16px;
     font-weight: 500;
   }
-`;
+`
 
 const StTextContainer = styled.div`
   flex-grow: 1;
@@ -485,7 +543,7 @@ const StTextContainer = styled.div`
     height: auto;
     resize: none;
   }
-`;
+`
 
 const StCodeBtn = styled.div`
   background-color: ${({ theme }) => theme.colors.gray04};
@@ -505,4 +563,4 @@ const StCodeBtn = styled.div`
   &:hover {
     background-color: ${({ theme }) => theme.colors.gray03};
   }
-`;
+`
