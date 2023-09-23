@@ -1,7 +1,8 @@
 import React from "react";
-import styled from "styled-components";
-import { DESKTOP_W, WINDOW_H, WINDOW_W } from "../../styles/theme";
 import { useLocation, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+
+import { DESKTOP_W, WINDOW_H } from "../../styles/theme";
 
 interface AppLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
   showHeader: boolean;
