@@ -28,7 +28,7 @@ const Router = () => {
             path="/interview-detail/:id"
             element={<InterviewDetailPage />}
           />
-          <Route path="/interview" element={<InterviewPage />} />
+          <Route path="/interview/:id" element={<InterviewPage />} />
           <Route path="/test" element={<TestPage />} />
         </Routes>
       ) : (

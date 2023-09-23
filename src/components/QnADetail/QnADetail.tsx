@@ -1,10 +1,7 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { CodeBlock } from "react-code-blocks";
 import styled from "styled-components";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import {
   BsFillTrashFill,
   BsChatLeftDotsFill,
@@ -21,39 +18,6 @@ import { getQnA, getQnARoom, postQnA } from "../../api/qnaApi";
 import { newQuestionType, qnaRoomType, qnaType } from "../../types/QnATypes";
 import { WINDOW_H, theme } from "../../styles/theme";
 
-interface CodeTextProps {
-  text: string;
-  lang: string;
-}
-
-const CodeText = ({ text, lang }: CodeTextProps) => {
-  console.log(text);
-  const str = text;
-  const regex = /```(\w+)\s(.*?)```/s; // 정규식 패턴
-
-  const match = str.match(regex); // 문자열에서 패턴과 일치하는 부분을 찾음
-
-  let language: string = "";
-  let codeBlock: string = "";
-
-  if (match) {
-    language = match[1]; // 언어 부분을 가져옴
-    codeBlock = match[2]; // 코드 블록 부분을 가져옴
-    console.log(`언어: ${language}`);
-    console.log(`코드 블록: ${codeBlock}`);
-  } else {
-    console.log("일치하는 부분을 찾을 수 없습니다.");
-  }
-
-  return (
-    <CodeBlock
-      text={codeBlock}
-      language={language.toLowerCase()}
-      showLineNumbers={true}
-    />
-  );
-};
-
 const QnADetail = () => {
   const [chatLoading, setChatLoading] = useState<boolean>(false);
   const [qnaRoomData, setQnARoomData] = useState<qnaRoomType>({
@@ -68,9 +32,8 @@ const QnADetail = () => {
     roomId: 0,
     question: "",
   });
-  const [codeQuestion, setCodeQuestion] = useState<string>("");
-  const [openCodeBlock, setOpenCodeBlock] = useState<boolean>(false);
   const [valid, setValid] = useState<boolean>(false);
+  const [openCode, setOpenCode] = useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -107,7 +70,6 @@ const QnADetail = () => {
       onSuccess: (data: qnaRoomType) => {
         setQnARoomData(data);
         setQnAData(data.qnas);
-        console.log("GET SUCCESS");
       },
       enabled: false,
     }
@@ -120,7 +82,7 @@ const QnADetail = () => {
       onSuccess: (data: qnaType[]) => {
         setQnAData(data);
         setChatLoading(false);
-        console.log("GET QNA DATA SUCCESS");
+        handleScroll();
       },
       enabled: false,
     }
@@ -148,14 +110,6 @@ const QnADetail = () => {
   const handleQuestion = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setQuestion({ ...question, question: e.target.value });
   };
-
-  // const handleCodeComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
-  //   setCodeQuestion(e.target.value);
-  // };
-
-  // const handleCode = () => {
-  //   setOpenCodeBlock((prev) => !prev);
-  // };
 
   const handleSubmit = () => {
     setChatLoading(true);
@@ -242,28 +196,20 @@ const QnADetail = () => {
                     rows={1}
                     placeholder="질문을 입력해 주세요."
                   />
-                  <div className="markdown-preview">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      children={codeQuestion}
-                    />
-                  </div>
-                  {openCodeBlock ? (
-                    <CodeText text={codeQuestion} lang={"javascript"} />
-                  ) : (
-                    <></>
-                  )}
-                  <StCodeBtn onClick={() => {}}>
-                    {/* <StCodeBtn onClick={() => handleCode()}> */}
+                  <StCodeBtn
+                    onClick={() => {
+                      setOpenCode(true);
+                    }}
+                  >
                     <BsCodeSlash fill={theme.colors.black02} />
                   </StCodeBtn>
                 </StTextContainer>
               </StNewChat>
               <div>
                 <Button
-                  btnStatus={valid ? "primary02" : "disabled"}
+                  btnStatus={valid && !chatLoading ? "primary02" : "disabled"}
                   clickHandler={() => handleSubmit()}
-                  disabled={!valid}
+                  disabled={!valid || chatLoading}
                 >
                   <span>질문하기</span>
                 </Button>
