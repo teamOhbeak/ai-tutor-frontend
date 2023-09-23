@@ -21,7 +21,6 @@ const InterviewList = () => {
     getInterviews()
   );
 
-  console.log(data);
   return (
     <>
       {!isLoading && isSuccess ? (

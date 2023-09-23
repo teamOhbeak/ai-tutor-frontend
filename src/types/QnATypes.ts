@@ -14,6 +14,8 @@ export type qnaType = {
   question: string;
   answer: string;
   sequence: number;
+  code?: string;
+  language?: string;
 };
 
 export type qnaRoomType = {

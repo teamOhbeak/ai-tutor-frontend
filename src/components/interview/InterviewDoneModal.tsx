@@ -1,30 +1,78 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import Button from "../elements/Button";
 
 interface InterviewDoneModalProps {
+  showScreen: boolean;
   clickHandler: () => void;
+  handleSaveVideo: () => void;
 }
 
-const InterviewDoneModal = ({ clickHandler }: InterviewDoneModalProps) => {
+type InterviewDoneStepType = "saveVideo" | "confirm" | "default";
+
+const InterviewDoneModal = ({
+  showScreen,
+  clickHandler,
+  handleSaveVideo,
+}: InterviewDoneModalProps) => {
+  const [step, setStep] = useState<InterviewDoneStepType>("default");
+
+  useEffect(() => {
+    showScreen ? setStep("saveVideo") : setStep("confirm");
+  }, []);
+
+  const handleSave = () => {
+    handleSaveVideo();
+    setStep("confirm");
+  };
+
   return (
     <StContainer>
       <StHeader>
         <h2>면접 종료</h2>
       </StHeader>
-      <StBody>
-        <StTitle>{`수고하셨습니다.\n\n면접이 종료되었습니다.`}</StTitle>
-      </StBody>
-      <StBtnWrapper>
-        <Button
-          btnStatus={"primary01"}
-          clickHandler={() => clickHandler()}
-          disabled={false}
-        >
-          <span>나가기</span>
-        </Button>
-      </StBtnWrapper>
+      {step !== "default" ? (
+        <>
+          <StBody>
+            <StTitle>
+              {step === "confirm"
+                ? `수고하셨습니다.\n\n면접이 종료되었습니다.`
+                : `면접 영상을 저장하시겠습니까?`}
+            </StTitle>
+          </StBody>
+          {step === "confirm" ? (
+            <StBtnWrapper>
+              <Button
+                btnStatus={"primary01"}
+                clickHandler={() => clickHandler()}
+                disabled={false}
+              >
+                <span>나가기</span>
+              </Button>
+            </StBtnWrapper>
+          ) : (
+            <StBtnWrapper>
+              <Button
+                btnStatus={"beige"}
+                clickHandler={() => clickHandler()}
+                disabled={false}
+              >
+                <span>저장하지 않음</span>
+              </Button>
+              <Button
+                btnStatus={"primary01"}
+                clickHandler={() => handleSave()}
+                disabled={step === "saveVideo" ? false : true}
+              >
+                <span>저장</span>
+              </Button>
+            </StBtnWrapper>
+          )}
+        </>
+      ) : (
+        <></>
+      )}
     </StContainer>
   );
 };

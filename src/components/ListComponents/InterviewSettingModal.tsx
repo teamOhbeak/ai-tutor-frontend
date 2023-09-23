@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
 import Button from "../elements/Button";
+import { postInterviews } from "../../api/interviewApi";
 import { theme } from "../../styles/theme";
 
 const TECH_STACK_LIST = [
@@ -20,8 +22,8 @@ const TECH_STACK_LIST = [
 const MAX_QUESTION = 10;
 const MAX_TIMER = 3;
 
-type TargetType = "techStack" | "maxQuestion" | "timer" | "default";
-type ConfirmDownloadType = "agree" | "disagree" | "default";
+type TargetType = "techStack" | "questionCount" | "maxWait" | "default";
+type RecordStatusType = "agree" | "disagree" | "default";
 
 interface InterviewSettingModalProps {
   clickHandler: () => void;
@@ -32,30 +34,41 @@ const InterviewSettingModal = ({
 }: InterviewSettingModalProps) => {
   const [selectTarget, setSelectTarget] = useState<TargetType>("default");
   const [techStack, setTechStack] = useState<string>(TECH_STACK_LIST[0]);
-  const [maxQuestion, setMaxQuestion] = useState<string>("1");
-  const [timer, setTimer] = useState<string>("1");
-  const [confirmDownload, setConfirmDownload] =
-    useState<ConfirmDownloadType>("default");
+  const [questionCount, setQuestionCount] = useState<string>("1");
+  const [maxWait, setMaxWait] = useState<string>("1");
+  const [recordStatus, setRecordStatus] = useState<RecordStatusType>("default");
   const [valid, setValid] = useState<boolean>(false);
 
-  const navigate = useNavigate();
-  const handleNavigate = (target: string) => navigate(target);
-
   useEffect(() => {
-    confirmDownload === "agree" || confirmDownload === "disagree"
+    recordStatus === "agree" || recordStatus === "disagree"
       ? setValid(true)
       : setValid(false);
-  }, [techStack, maxQuestion, timer, confirmDownload]);
+  }, [techStack, questionCount, maxWait, recordStatus]);
+
+  const { mutate: handlePostInterviews } = useMutation(postInterviews, {
+    onSuccess: (data) => {
+      window.location.href = `/interview/${data.interviewId}`;
+    },
+  });
 
   const handleOption = (target: TargetType, val: string) => {
     if (target === "techStack") setTechStack(val);
-    if (target === "maxQuestion") setMaxQuestion(val);
-    if (target === "timer") setTimer(val);
+    if (target === "questionCount") setQuestionCount(val);
+    if (target === "maxWait") setMaxWait(val);
     setSelectTarget("default");
   };
 
-  const handleDownloadVideo = (val: ConfirmDownloadType) => {
-    setConfirmDownload(val);
+  const handleDownloadVideo = (val: RecordStatusType) => {
+    setRecordStatus(val);
+  };
+
+  const handleSubmit = () => {
+    handlePostInterviews({
+      stack: techStack,
+      questionCount: Number(questionCount),
+      maxWait: Number(maxWait),
+      record: recordStatus === "agree" ? true : false,
+    });
   };
 
   return (
@@ -99,20 +112,20 @@ const InterviewSettingModal = ({
           </StSelectContainer>
         </StItem>
         <StItem>
-          <StSettingText>질문 수</StSettingText>
+          <StSettingText>질문 수 (개)</StSettingText>
           <StSelectContainer>
             <StSelect
-              selected={selectTarget === "maxQuestion"}
+              selected={selectTarget === "questionCount"}
               onClick={() =>
                 setSelectTarget((prev) =>
-                  prev === "maxQuestion" ? "default" : "maxQuestion"
+                  prev === "questionCount" ? "default" : "questionCount"
                 )
               }
             >
-              <span>{maxQuestion}</span>
+              <span>{questionCount}</span>
               <MdOutlineKeyboardArrowDown fill={theme.colors.black02} />
             </StSelect>
-            {selectTarget === "maxQuestion" ? (
+            {selectTarget === "questionCount" ? (
               <StOptionContainer>
                 {Array.from({ length: MAX_QUESTION }, (_, i) => i + 1).map(
                   (val, idx) => (
@@ -120,7 +133,7 @@ const InterviewSettingModal = ({
                       $isLast={idx === MAX_QUESTION - 1}
                       key={val}
                       onClick={() =>
-                        handleOption("maxQuestion", val.toString())
+                        handleOption("questionCount", val.toString())
                       }
                     >
                       <span>{val.toString()}</span>
@@ -134,27 +147,27 @@ const InterviewSettingModal = ({
           </StSelectContainer>
         </StItem>
         <StItem>
-          <StSettingText>답변 대기 시간</StSettingText>
+          <StSettingText>답변 대기 시간 (분)</StSettingText>
           <StSelectContainer>
             <StSelect
-              selected={selectTarget === "timer"}
+              selected={selectTarget === "maxWait"}
               onClick={() =>
                 setSelectTarget((prev) =>
-                  prev === "timer" ? "default" : "timer"
+                  prev === "maxWait" ? "default" : "maxWait"
                 )
               }
             >
-              <span>{timer}</span>
+              <span>{maxWait}</span>
               <MdOutlineKeyboardArrowDown fill={theme.colors.black02} />
             </StSelect>
-            {selectTarget === "timer" ? (
+            {selectTarget === "maxWait" ? (
               <StOptionContainer>
                 {Array.from({ length: MAX_TIMER }, (_, i) => i + 1).map(
                   (val, idx) => (
                     <StOption
                       $isLast={idx === MAX_TIMER - 1}
                       key={val}
-                      onClick={() => handleOption("timer", val.toString())}
+                      onClick={() => handleOption("maxWait", val.toString())}
                     >
                       <span>{val.toString()}</span>
                     </StOption>
@@ -170,14 +183,14 @@ const InterviewSettingModal = ({
           <StSettingText>면접 영상을 로컬에 저장하시겠습니까?</StSettingText>
           <StDownloadBtnWrapper>
             <Button
-              btnStatus={confirmDownload === "agree" ? "primary01" : "beige"}
+              btnStatus={recordStatus === "agree" ? "primary01" : "beige"}
               clickHandler={() => handleDownloadVideo("agree")}
               disabled={false}
             >
               <span>네</span>
             </Button>
             <Button
-              btnStatus={confirmDownload === "disagree" ? "primary01" : "beige"}
+              btnStatus={recordStatus === "disagree" ? "primary01" : "beige"}
               clickHandler={() => handleDownloadVideo("disagree")}
               disabled={false}
             >
@@ -196,7 +209,7 @@ const InterviewSettingModal = ({
         </Button>
         <Button
           btnStatus={valid ? "primary01" : "disabled"}
-          clickHandler={() => handleNavigate("/interview")}
+          clickHandler={() => handleSubmit()}
           disabled={!valid}
         >
           <span>질문하기</span>

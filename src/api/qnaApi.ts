@@ -1,6 +1,7 @@
 import { instance } from "./api";
 import { newQnARoomType, newQuestionType } from "../types/QnATypes";
 
+// GET QNA LIST
 export const getQnARooms = async () => {
   try {
     const res = await instance.get(`/api/qna-rooms`);
@@ -10,6 +11,7 @@ export const getQnARooms = async () => {
   }
 };
 
+// GET QNA ROOM
 export const getQnARoom = async (id: string) => {
   try {
     const res = await instance.get(`/api/qna-rooms/${id}`);
@@ -19,6 +21,7 @@ export const getQnARoom = async (id: string) => {
   }
 };
 
+// CREATE QNA ROOM
 export const postQnARoom = async (data: newQnARoomType) => {
   try {
     const res = await instance.post(`/api/qna-rooms`, data);
@@ -28,6 +31,7 @@ export const postQnARoom = async (data: newQnARoomType) => {
   }
 };
 
+// DELETE QNA ROOM
 export const deleteQnARoom = async (id: string) => {
   try {
     await instance.delete(`/api/qna-rooms/${id}`);
@@ -36,6 +40,7 @@ export const deleteQnARoom = async (id: string) => {
   }
 };
 
+// GET ANSWER
 export const getQnA = async (id: string) => {
   try {
     const res = await instance.get(`/api/qna-rooms/${id}/questions`);
@@ -45,6 +50,7 @@ export const getQnA = async (id: string) => {
   }
 };
 
+// ASK QUESTION
 export const postQnA = async (data: newQuestionType) => {
   try {
     const res = await instance.post(

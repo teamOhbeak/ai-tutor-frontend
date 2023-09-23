@@ -1,7 +1,14 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
+import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter";
+import typescript from "react-syntax-highlighter/dist/esm/languages/prism/typescript";
+import javascript from "react-syntax-highlighter/dist/esm/languages/prism/javascript";
+import java from "react-syntax-highlighter/dist/esm/languages/prism/java";
+import jsx from "react-syntax-highlighter/dist/esm/languages/prism/jsx";
+
 import {
   BsFillTrashFill,
   BsChatLeftDotsFill,
@@ -17,6 +24,11 @@ import LoadingEllipsis from "../elements/LoadingEllipsis";
 import { getQnA, getQnARoom, postQnA } from "../../api/qnaApi";
 import { newQuestionType, qnaRoomType, qnaType } from "../../types/QnATypes";
 import { WINDOW_H, theme } from "../../styles/theme";
+
+SyntaxHighlighter.registerLanguage("typescript", typescript);
+SyntaxHighlighter.registerLanguage("javascript", javascript);
+SyntaxHighlighter.registerLanguage("java", java);
+SyntaxHighlighter.registerLanguage("jsx", jsx);
 
 const QnADetail = () => {
   const [chatLoading, setChatLoading] = useState<boolean>(false);
@@ -41,8 +53,6 @@ const QnADetail = () => {
 
   const navigate = useNavigate();
   const params = useParams();
-
-  const queryClient = new QueryClient();
 
   // test
   useEffect(() => {
@@ -70,6 +80,19 @@ const QnADetail = () => {
       onSuccess: (data: qnaRoomType) => {
         setQnARoomData(data);
         setQnAData(data.qnas);
+
+        data.qnas.map((data) => {
+          const regex = /```(\w+)\s(.*?)```/s; // 정규식 패턴
+          const match = data.answer.match(regex); // 문자열에서 패턴과 일치하는 부분을 찾음
+          let language: string = "";
+
+          if (match) {
+            language = match[1]; // 언어 부분을 가져옴
+            data.language = language.toLocaleLowerCase();
+            data.code = match[2]; // 코드 블록 부분을 가져옴
+            data.answer = data.answer.replace(regex, "");
+          }
+        });
       },
       enabled: false,
     }
@@ -83,6 +106,18 @@ const QnADetail = () => {
         setQnAData(data);
         setChatLoading(false);
         handleScroll();
+        data.map((data) => {
+          const regex = /```(\w+)\s(.*?)```/s; // 정규식 패턴
+          const match = data.answer.match(regex); // 문자열에서 패턴과 일치하는 부분을 찾음
+          let language: string = "";
+
+          if (match) {
+            language = match[1]; // 언어 부분을 가져옴
+            data.language = language.toLocaleLowerCase();
+            data.code = match[2]; // 코드 블록 부분을 가져옴
+            data.answer = data.answer.replace(regex, "");
+          }
+        });
       },
       enabled: false,
     }
@@ -161,7 +196,9 @@ const QnADetail = () => {
                 <StChatList>
                   <>
                     {qnaData.map((val, i) => {
-                      const { id, question, answer, sequence } = val;
+                      // const { id, question, answer, sequence } = val;
+                      const { id, question, answer, sequence, code, language } =
+                        val;
                       return (
                         <li key={`${i}-${id}`}>
                           <StChatWrapper>
@@ -174,7 +211,18 @@ const QnADetail = () => {
                             <StAvatar>
                               <BsChatLeftDotsFill />
                             </StAvatar>
-                            <StChat>{answer}</StChat>
+                            <StChat>
+                              {answer}
+                              {code && (
+                                <SyntaxHighlighter
+                                  language={language}
+                                  style={dark}
+                                  showLineNumbers={true}
+                                >
+                                  {code}
+                                </SyntaxHighlighter>
+                              )}
+                            </StChat>
                           </StChatWrapper>
                         </li>
                       );

@@ -7,7 +7,7 @@ import { InterviewAnswerType } from "../../types/interviewTypes";
 interface InterviewItemProps {
   isFollowUp: boolean;
   question: string;
-  answer: InterviewAnswerType;
+  answer: InterviewAnswerType | null;
 }
 
 const InterviewItem = ({
@@ -29,7 +29,7 @@ const InterviewItem = ({
             <FaUserAlt />
           </StAvatar>
           <StComment>
-            {answer.contents ? answer.contents : "답변 없음"}
+            {answer.answerText ? answer.answerText : "답변 없음"}
           </StComment>
         </StCommentWrapper>
       ) : (
